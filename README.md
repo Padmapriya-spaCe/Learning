@@ -1,79 +1,87 @@
 He seems to be saying:
 
-“Before Spring Boot hides all the plumbing from you, build a tiny application where you personally deal with HTTP → Servlet → Java → JDBC → DB → response → UI. Then you will understand what Spring Boot is automating.”
+> **“Before Spring Boot hides all the plumbing from you, build a tiny application where you personally deal with HTTP → Servlet → Java → JDBC → DB → response → UI. Then you will understand what Spring Boot is automating.”**
 
 That interpretation fits your notes very well.
 
-One correction to the specification you received: “no dependencies/libraries” and “H2 + Servlets + Tomcat” cannot literally all be true. A servlet application needs a servlet API/container, and H2 needs its JDBC driver. So I would phrase the requirement as “No application frameworks such as Spring Boot, Hibernate/JPA, Lombok, frontend frameworks, etc.; use raw Servlets + JDBC.”
+One correction to the specification you received: **“no dependencies/libraries” and “H2 + Servlets + Tomcat” cannot literally all be true.** A servlet application needs a servlet API/container, and H2 needs its JDBC driver. So I would phrase the requirement as **“No application frameworks such as Spring Boot, Hibernate/JPA, Lombok, frontend frameworks, etc.; use raw Servlets + JDBC.”**
 
-1. The project you should convey to your teammate
+---
+
+# 1. The project you should convey to your teammate
 
 You can send your friend this:
 
-Mini Project — Employee & Company Management System
+## Mini Project — Employee & Company Management System
 
-We need to build a small Java web application without Spring Boot or other frameworks, mainly to understand what frameworks normally do for us.
+We need to build a **small Java web application without Spring Boot or other frameworks**, mainly to understand what frameworks normally do for us.
 
 The application manages two entities:
 
-Company
-Employee
+* **Company**
+* **Employee**
 
-An employee belongs to one company, so there is a simple Company → Employee relationship.
+An employee belongs to one company, so there is a simple **Company → Employee relationship**.
 
-UI
+### UI
 
 The page will have a simple two-part layout:
 
-Left side
+**Left side**
 
-Company
-Employee
+* `Company`
+* `Employee`
 
-Right side
+**Right side**
 
-Displays the records for whichever tab is selected.
+* Displays the records for whichever tab is selected.
 
-For example, clicking Company displays:
+For example, clicking **Company** displays:
 
 | ID | Company Name | Location  |
 | -- | ------------ | --------- |
 | 1  | Citi         | Chennai   |
 | 2  | ABC Corp     | Bangalore |
 
-
-Clicking Employee displays:
+Clicking **Employee** displays:
 
 | ID | Name  | Role      | Email                                     | Company ID |
 | -- | ----- | --------- | ----------------------------------------- | ---------- |
 | 1  | Arun  | Developer | [arun@email.com](mailto:arun@email.com)   | 1          |
 | 2  | Priya | Analyst   | [priya@email.com](mailto:priya@email.com) | 2          |
 
+No sophisticated UI or styling is required. **Functionality and code structure are the focus.**
 
-No sophisticated UI or styling is required. Functionality and code structure are the focus.
+---
 
-CRUD operations
-1. Create
+## CRUD operations
 
-An Add New button will be available outside the table.
+### 1. Create
+
+An **Add New** button will be available outside the table.
 
 Clicking it opens an empty form.
 
 For example, for Employee:
+
+```text
 Name:       __________
 Role:       __________
 Email:      __________
 Company ID: __________
 
 [Create] [Reset] [Cancel]
+```
 
+Clicking **Create** sends the data to the backend, which inserts a new employee into the database.
 
-Clicking Create sends the data to the backend, which inserts a new employee into the database.
+---
 
-2. Read
+### 2. Read
 
 When Company or Employee is selected:
 
+```text
 UI
  ↓
 JavaScript
@@ -85,38 +93,48 @@ DAO
 JDBC
  ↓
 Database
+```
 
 The database records are retrieved and displayed in the table.
 
-3. Update
+---
+
+### 3. Update
 
 Clicking an existing row opens the form populated with that record.
 
 For example:
 
+```text
 Name:       Priya
 Role:       Analyst
 Email:      priya@email.com
 Company ID: 2
 
 [Update] [Delete] [Reset] [Cancel]
+```
 
-The user can modify the values and click Update.
+The user can modify the values and click **Update**.
 
-The backend performs an SQL UPDATE.
+The backend performs an SQL `UPDATE`.
 
-4. Delete
+---
 
-When an existing record is opened, clicking Delete removes that record from the database.
+### 4. Delete
+
+When an existing record is opened, clicking **Delete** removes that record from the database.
 
 For the initial version, keep deletion simple. If a company has employees associated with it, we can either prevent deletion or define the FK behavior explicitly rather than introducing complicated cascading logic.
 
-5. Reset
+---
 
-Reset should have a clear, consistent meaning.
+### 5. Reset
 
-For a new record:
+Reset should have a **clear, consistent meaning**.
 
+For a **new record**:
+
+```text
 Name:       ABC
 Role:       Developer
 
@@ -124,11 +142,13 @@ Role:       Developer
 
 Name:
 Role:
+```
 
 It clears the entered values.
 
-For an existing record:
+For an **existing record**:
 
+```text
 Name: Priya
 Role: Developer
 
@@ -138,21 +158,25 @@ Role: Developer
 
 Name: Priya
 Role: Analyst
+```
 
 It restores the values originally loaded from the database.
 
-Reset should not itself update the database.
+**Reset should not itself update the database.**
 
 Cancel simply closes the form without saving anything.
 
-2. Backend — the important part of this exercise
+---
+
+# 2. Backend — the important part of this exercise
 
 This is where your manager is probably evaluating you.
 
-We should deliberately not use Spring Boot.
+We should deliberately **not use Spring Boot**.
 
 The flow should be something like:
 
+```text
 Browser
    ↓
 HTML + Vanilla JavaScript
@@ -168,9 +192,11 @@ DAO
 JDBC
    ↓
 Database
+```
 
 And the response comes back:
 
+```text
 Database
    ↓
 DAO
@@ -184,86 +210,110 @@ JSON response
 JavaScript
    ↓
 HTML table
-Important separation
-webapp/
+```
+
+### Important separation
+
+#### `webapp/`
 
 Contains:
 
+```text
 index.html
 app.js
+```
 
 Responsible only for:
 
-displaying UI
-handling button clicks
-opening/closing forms
-calling backend APIs using fetch()
-rendering returned data
+* displaying UI
+* handling button clicks
+* opening/closing forms
+* calling backend APIs using `fetch()`
+* rendering returned data
 
 No SQL here.
 
-servlet/
+---
+
+### `servlet/`
 
 Example:
 
+```text
 CompanyServlet.java
 EmployeeServlet.java
+```
 
 Responsible for:
 
-receiving HTTP requests
-identifying GET/POST/PUT/DELETE operations
-reading request parameters/body
-calling appropriate backend logic
-returning HTTP/JSON responses
+* receiving HTTP requests
+* identifying GET/POST/PUT/DELETE operations
+* reading request parameters/body
+* calling appropriate backend logic
+* returning HTTP/JSON responses
 
-No SQL queries here.
+**No SQL queries here.**
 
-service/
+---
+
+### `service/`
 
 Example:
 
+```text
 CompanyService.java
 EmployeeService.java
+```
 
 Responsible for:
 
-business logic
-validation
-deciding what operation should happen
-calling DAO
+* business logic
+* validation
+* deciding what operation should happen
+* calling DAO
 
 This layer is useful because later you can see how Spring's service-related features simplify this kind of structure.
 
-dao/
+---
+
+### `dao/`
 
 Example:
 
+```text
 CompanyDAO.java
 EmployeeDAO.java
+```
 
 This is where JDBC and SQL live.
 
 For example:
 
+```text
 SELECT * FROM COMPANY
 INSERT INTO COMPANY ...
 UPDATE COMPANY ...
 DELETE FROM COMPANY ...
+```
 
 The Servlet should never contain these SQL statements.
 
-model/
+---
+
+### `model/`
 
 Example:
 
+```text
 Company.java
 Employee.java
+```
 
 These are plain Java classes representing database records.
 
 For example:
 
+```text
 Employee
 ---------
 id
@@ -271,10 +321,15 @@ name
 role
 email
 companyId
-3. Suggested project structure
+```
+
+---
+
+# 3. Suggested project structure
 
 A simple version could look like:
 
+```text
 employee-company-app/
 │
 ├── src/
@@ -307,24 +362,36 @@ employee-company-app/
 │
 └── WEB-INF/
     └── web.xml
-    
-Depending on how your manager wants the project configured, web.xml may be replaced/partially replaced by servlet annotations such as @WebServlet.
+```
+
+Depending on how your manager wants the project configured, `web.xml` may be replaced/partially replaced by servlet annotations such as `@WebServlet`.
 
 And if Tomcat's connection pool is specifically part of the exercise, there may also be:
 
+```text
 META-INF/
     context.xml
-4. Database
+```
 
-Keep the database very small.
+---
 
-COMPANY
+# 4. Database
+
+Keep the database **very small**.
+
+### COMPANY
+
+```text
 COMPANY
 -------
 ID
 NAME
 LOCATION
-EMPLOYEE
+```
+
+### EMPLOYEE
+
+```text
 EMPLOYEE
 --------
 ID
@@ -332,206 +399,225 @@ NAME
 ROLE
 EMAIL
 COMPANY_ID
+```
 
 Relationship:
 
+```text
 COMPANY
    1
    |
    |
    N
 EMPLOYEE
+```
 
 Example:
 
+```text
 Company
 1 | Citi | Chennai
 
 Employees
 1 | Arun  | Developer | ... | 1
 2 | Priya | Analyst   | ... | 1
+```
 
 That's enough.
 
 You don't need authentication, pagination, search, sorting, fancy validation, dashboards, charts, etc.
 
-5. The final AI prompt I'd actually give to an AI coding tool
+---
 
-I would not give the AI the previous specification verbatim because it is already making some implementation decisions for you.
+# 5. The final AI prompt I'd actually give to an AI coding tool
+
+I would **not** give the AI the previous specification verbatim because it is already making some implementation decisions for you.
 
 Give it this instead:
 
-Build a small Java web application called Employee-Company Management System.
+> **Build a small Java web application called Employee-Company Management System.**
+>
+> The purpose of this project is educational: I want to understand the plumbing that frameworks such as Spring Boot normally abstract away.
+>
+> ### Constraints
+>
+> * Do NOT use Spring Boot.
+> * Do NOT use Spring MVC.
+> * Do NOT use Hibernate/JPA.
+> * Do NOT use Lombok.
+> * Do NOT use frontend frameworks such as React or Angular.
+> * Use plain HTML and vanilla JavaScript for the frontend.
+> * Use Java Servlets for handling HTTP requests.
+> * Use JDBC for database access.
+> * Use a relational database with two tables: COMPANY and EMPLOYEE.
+> * Use only the minimum required runtime/container/JDBC dependencies. Do not introduce additional frameworks or libraries.
+> * No effort is required for visual design; keep the UI simple.
+>
+> ### Functional requirements
+>
+> The application has two tabs on the left:
+>
+> 1. Company
+> 2. Employee
+>
+> Selecting a tab displays the corresponding database records on the right.
+>
+> Company fields:
+>
+> * ID
+> * Name
+> * Location
+>
+> Employee fields:
+>
+> * ID
+> * Name
+> * Role
+> * Email
+> * Company ID
+>
+> Provide an **Add New** button outside the table.
+>
+> Clicking Add New opens an empty form.
+>
+> Clicking an existing row opens a form populated with that record.
+>
+> Existing records must support:
+>
+> * Update
+> * Delete
+> * Reset
+> * Cancel
+>
+> New records must support:
+>
+> * Create
+> * Reset
+> * Cancel
+>
+> Reset on a new record clears the entered values.
+>
+> Reset on an existing record restores the values originally loaded into the form.
+>
+> Cancel closes the form without saving changes.
+>
+> ### Architecture
+>
+> Maintain clear separation of concerns:
+>
+> ```text
+> HTML/JavaScript
+>        ↓
+> Servlet
+>        ↓
+> Service
+>        ↓
+> DAO
+>        ↓
+> JDBC
+>        ↓
+> Database
+> ```
+>
+> SQL must exist only in the DAO layer.
+>
+> Servlet classes must not contain SQL.
+>
+> UI JavaScript must not contain SQL or database logic.
+>
+> Model classes should represent Company and Employee.
+>
+> ### Error handling
+>
+> Handle database/SQL errors in the backend and return appropriate HTTP status codes and simple JSON error responses to the frontend.
+>
+> ### Code quality
+>
+> Use meaningful Java class, method and variable names.
+>
+> Follow standard Java naming conventions.
+>
+> Keep responsibilities separated into appropriate packages.
+>
+> Avoid unnecessary abstraction because this is a small learning project.
+>
+> **Important: Do not generate the entire project blindly. First explain the responsibility of each file and the request flow for Create, Read, Update and Delete. Then generate the implementation one layer at a time so I can understand each part.**
 
-The purpose of this project is educational: I want to understand the plumbing that frameworks such as Spring Boot normally abstract away.
+That **last paragraph is particularly important for you**.
 
-Constraints
-Do NOT use Spring Boot.
-Do NOT use Spring MVC.
-Do NOT use Hibernate/JPA.
-Do NOT use Lombok.
-Do NOT use frontend frameworks such as React or Angular.
-Use plain HTML and vanilla JavaScript for the frontend.
-Use Java Servlets for handling HTTP requests.
-Use JDBC for database access.
-Use a relational database with two tables: COMPANY and EMPLOYEE.
-Use only the minimum required runtime/container/JDBC dependencies. Do not introduce additional frameworks or libraries.
-No effort is required for visual design; keep the UI simple.
-Functional requirements
+---
 
-The application has two tabs on the left:
+# 6. How big is this actually?
 
-Company
-Employee
-
-Selecting a tab displays the corresponding database records on the right.
-
-Company fields:
-
-ID
-Name
-Location
-
-Employee fields:
-
-ID
-Name
-Role
-Email
-Company ID
-
-Provide an Add New button outside the table.
-
-Clicking Add New opens an empty form.
-
-Clicking an existing row opens a form populated with that record.
-
-Existing records must support:
-
-Update
-Delete
-Reset
-Cancel
-
-New records must support:
-
-Create
-Reset
-Cancel
-
-Reset on a new record clears the entered values.
-
-Reset on an existing record restores the values originally loaded into the form.
-
-Cancel closes the form without saving changes.
-
-Architecture
-
-Maintain clear separation of concerns:
-
-HTML/JavaScript
-       ↓
-Servlet
-       ↓
-Service
-       ↓
-DAO
-       ↓
-JDBC
-       ↓
-Database
-
-SQL must exist only in the DAO layer.
-
-Servlet classes must not contain SQL.
-
-UI JavaScript must not contain SQL or database logic.
-
-Model classes should represent Company and Employee.
-
-Error handling
-
-Handle database/SQL errors in the backend and return appropriate HTTP status codes and simple JSON error responses to the frontend.
-
-Code quality
-
-Use meaningful Java class, method and variable names.
-
-Follow standard Java naming conventions.
-
-Keep responsibilities separated into appropriate packages.
-
-Avoid unnecessary abstraction because this is a small learning project.
-
-Important: Do not generate the entire project blindly. First explain the responsibility of each file and the request flow for Create, Read, Update and Delete. Then generate the implementation one layer at a time so I can understand each part.
-
-That last paragraph is particularly important for you.
-
-6. How big is this actually?
-
-It's small from a business perspective, but not tiny for a beginner because you're deliberately removing Spring Boot.
+It's small from a business perspective, but **not tiny for a beginner** because you're deliberately removing Spring Boot.
 
 I'd roughly break it down like this:
 
-Part	Difficulty
-HTML layout	🟢 Easy
-Vanilla JS tab switching	🟢 Easy
-Form/modal handling	🟢 Easy–Medium
-Java model classes	🟢 Easy
-SQL tables	🟢 Easy
-Basic JDBC	🟡 Medium
-DAO	🟡 Medium
-Servlets	🟡 Medium
-HTTP request/response	🟡 Medium
-JSON handling	🟡 Medium
-Tomcat configuration	🟠 Medium
-Connection pooling	🟠 Medium–Hard
-Debugging entire flow	🟠 Medium–Hard
+| Part                     | Difficulty     |
+| ------------------------ | -------------- |
+| HTML layout              | 🟢 Easy        |
+| Vanilla JS tab switching | 🟢 Easy        |
+| Form/modal handling      | 🟢 Easy–Medium |
+| Java model classes       | 🟢 Easy        |
+| SQL tables               | 🟢 Easy        |
+| Basic JDBC               | 🟡 Medium      |
+| DAO                      | 🟡 Medium      |
+| Servlets                 | 🟡 Medium      |
+| HTTP request/response    | 🟡 Medium      |
+| JSON handling            | 🟡 Medium      |
+| Tomcat configuration     | 🟠 Medium      |
+| Connection pooling       | 🟠 Medium–Hard |
+| Debugging entire flow    | 🟠 Medium–Hard |
 
-For you as a beginner with Java/Spring Boot knowledge but limited raw Servlet/JDBC experience, I wouldn't consider this a huge project.
+For **you as a beginner with Java/Spring Boot knowledge but limited raw Servlet/JDBC experience**, I wouldn't consider this a huge project.
 
-If you code it yourself
+### If you code it yourself
 
 Roughly:
 
-3–5 focused days to build it while actually understanding what you're doing.
+**3–5 focused days** to build it while actually understanding what you're doing.
 
-Potentially 5–7 days if you're learning Servlets, JDBC and Tomcat from scratch.
+Potentially **5–7 days** if you're learning Servlets, JDBC and Tomcat from scratch.
 
-If AI generates everything
+### If AI generates everything
 
-You could probably get something running in a few hours.
+You could probably get something running in **a few hours**.
 
 But you'd miss the entire point of your manager's exercise.
 
-7. So should you use AI or code everything yourself?
+---
 
-I'd do a hybrid approach, especially because your manager explicitly said he doesn't want blind AI usage.
+# 7. So should you use AI or code everything yourself?
+
+I'd do **a hybrid approach**, especially because your manager explicitly said he doesn't want blind AI usage.
 
 Don't do:
 
-"AI, build this entire application."
+> "AI, build this entire application."
 
 Then copy → paste → run → done.
 
 Instead:
 
-Phase 1 — You write it
+### Phase 1 — You write it
 
 Write these yourself:
 
+```text
 Company.java
 Employee.java
 database tables
 basic HTML
 basic JavaScript
+```
 
 These should be straightforward.
 
-Phase 2 — Learn raw JDBC
+### Phase 2 — Learn raw JDBC
 
 Before asking AI to generate anything, understand this flow:
 
+```text
 Connection
    ↓
 PreparedStatement
@@ -541,25 +627,29 @@ executeQuery / executeUpdate
 ResultSet
    ↓
 Java object
+```
 
 You should be able to explain what every one of those does.
 
-Phase 3 — Write one DAO yourself
+### Phase 3 — Write one DAO yourself
 
 For example:
 
+```text
 CompanyDAO.getAllCompanies()
+```
 
 Then ask AI:
 
-"Review my DAO. Don't rewrite it. Tell me what is wrong and why."
+> "Review my DAO. Don't rewrite it. Tell me what is wrong and why."
 
-That's much better learning than generating it.
+That's **much better learning** than generating it.
 
-Phase 4 — Write one Servlet
+### Phase 4 — Write one Servlet
 
 Understand:
 
+```text
 HTTP request
       ↓
 Servlet
@@ -571,25 +661,29 @@ DAO
 DB
       ↓
 response
+```
 
 Once you've understood one, Employee becomes largely repetition.
 
-Phase 5 — Use AI as a reviewer
+### Phase 5 — Use AI as a reviewer
 
 Instead of:
 
-"Generate EmployeeServlet."
+> "Generate EmployeeServlet."
 
 Ask:
 
-"Here is my EmployeeServlet. Review it for Java/Servlet best practices. Don't modify the code. Explain each problem and let me fix it."
+> "Here is my EmployeeServlet. Review it for Java/Servlet best practices. Don't modify the code. Explain each problem and let me fix it."
 
 That will make you much stronger when you eventually start using Spring Boot.
 
-8. The really important thing your manager is trying to teach
+---
+
+# 8. The really important thing your manager is trying to teach
 
 Later, when you use Spring Boot, you'll see something like:
 
+```java
 @RestController
 public class EmployeeController {
 
@@ -598,11 +692,13 @@ public class EmployeeController {
         return employeeService.getEmployees();
     }
 }
+```
 
 It looks ridiculously simple.
 
 But right now, you're going to discover that underneath it there is actually:
 
+```text
 Browser
    ↓
 HTTP
@@ -636,35 +732,39 @@ JSON
 HTTP response
    ↓
 Browser
+```
 
-That is the real value of this exercise.
+**That is the real value of this exercise.**
 
 Spring Boot later essentially lets you say:
 
-"I want an endpoint here."
+> "I want an endpoint here."
 
 instead of manually wiring a large portion of that plumbing.
 
 And similarly, JDBC teaches you why things such as:
 
-connection management
-connection pooling
-prepared statements
-exception handling
-dependency injection
-controllers
-services
-repositories
-object mapping
+* connection management
+* connection pooling
+* prepared statements
+* exception handling
+* dependency injection
+* controllers
+* services
+* repositories
+* object mapping
 
 exist in the first place.
 
-One final recommendation
+---
 
-I would not start with connection pooling.
+## One final recommendation
+
+I would **not start with connection pooling**.
 
 Build the first version in this order:
 
+```text
 1. Database
       ↓
 2. Company/Employee Java models
@@ -688,17 +788,20 @@ Build the first version in this order:
 11. Error handling
       ↓
 12. Connection pooling
+```
 
-That way, when something breaks, you know which layer is responsible rather than having a 1,000-line AI-generated project that you don't understand.
+That way, when something breaks, you know **which layer is responsible** rather than having a 1,000-line AI-generated project that you don't understand.
 
-And yes: this is a very reasonable first project before moving into Spring Boot. It is small enough to finish, but it exposes exactly the kind of underlying plumbing your manager wants you to appreciate.
+**And yes: this is a very reasonable first project before moving into Spring Boot.** It is small enough to finish, but it exposes exactly the kind of underlying plumbing your manager wants you to appreciate.
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
 so you are using h2 database or smtg else here and relationship is 1 emp belongs to 1 company or 1 company has n employees or is it both, and give me suggestions of how i build this myself with minimal ai used to my advantage so that i learn, like form where i get code see and write or ask ai to generate file by file or how
 
-Yes. I would use H2 for this exercise if your manager is okay with it. H2 is a small relational database that is convenient for a local learning project. The important thing is that you interact with it through plain JDBC, not through JPA/Hibernate.
+Yes. **I would use H2 for this exercise** if your manager is okay with it. H2 is a small relational database that is convenient for a local learning project. The important thing is that you interact with it through **plain JDBC**, not through JPA/Hibernate.
 
-And the relationship is both ways conceptually, but it is one-to-many overall:
+And the relationship is **both ways conceptually, but it is one-to-many overall**:
 
+```text
 Company
    1
    │
@@ -706,14 +809,16 @@ Company
    │
    N
 Employee
+```
 
 Meaning:
 
-One Company can have many Employees
-Each Employee belongs to one Company
+* **One Company can have many Employees**
+* **Each Employee belongs to one Company**
 
-So in the EMPLOYEE table:
+So in the `EMPLOYEE` table:
 
+```text
 COMPANY
 ----------------
 ID
@@ -728,9 +833,11 @@ NAME
 ROLE
 EMAIL
 COMPANY_ID  ← foreign key
+```
 
 For example:
 
+```text
 COMPANY
 1 | Citi     | Chennai
 2 | Microsoft| Bangalore
@@ -740,30 +847,35 @@ EMPLOYEE
 1 | Arun  | Developer | ... | 1
 2 | Priya | Analyst   | ... | 1
 3 | Ravi  | Developer | ... | 2
+```
 
 Here Arun and Priya belong to Citi, while Ravi belongs to Microsoft.
 
-You don't need a separate relationship table because this is a simple 1:N relationship.
+You **don't need a separate relationship table** because this is a simple 1:N relationship.
 
-How I recommend YOU build this
+---
 
-Given what your manager told you, I would not ask AI to generate the whole application file-by-file and then read it.
+# How I recommend YOU build this
+
+Given what your manager told you, I would **not** ask AI to generate the whole application file-by-file and then read it.
 
 That still becomes:
 
-AI thinks → AI codes → you understand afterwards.
+> AI thinks → AI codes → you understand afterwards.
 
 Instead, make it:
 
-You think → you attempt → AI helps when stuck → you write → AI reviews.
+> **You think → you attempt → AI helps when stuck → you write → AI reviews.**
 
 That's much more valuable.
 
-The approach I'd recommend
-🟢 Stage 1 — Understand the architecture before coding
+## The approach I'd recommend
+
+### 🟢 Stage 1 — Understand the architecture before coding
 
 First, make yourself understand this:
 
+```text
              Browser
                 │
           HTML + JS
@@ -779,13 +891,15 @@ First, make yourself understand this:
              JDBC
                 │
               H2
+```
 
 Before writing anything, you should be able to answer:
 
-"If I click Create Employee, what exactly happens?"
+**"If I click Create Employee, what exactly happens?"**
 
 Answer:
 
+```text
 Click Create
      ↓
 JavaScript gets form values
@@ -805,10 +919,13 @@ DAO returns result
 Servlet sends response
      ↓
 JavaScript refreshes employee table
+```
 
 If you understand this, the actual coding becomes much easier.
 
-🟢 Stage 2 — Build the database yourself
+---
+
+# 🟢 Stage 2 — Build the database yourself
 
 Don't ask AI to create the database.
 
@@ -816,14 +933,17 @@ Write the SQL yourself.
 
 Something like:
 
+```sql
 CREATE TABLE COMPANY (
     ID INT PRIMARY KEY,
     NAME VARCHAR(100),
     LOCATION VARCHAR(100)
 );
+```
 
 Then:
 
+```sql
 CREATE TABLE EMPLOYEE (
     ID INT PRIMARY KEY,
     NAME VARCHAR(100),
@@ -832,30 +952,36 @@ CREATE TABLE EMPLOYEE (
     COMPANY_ID INT,
     FOREIGN KEY (COMPANY_ID) REFERENCES COMPANY(ID)
 );
+```
 
 Insert 2–3 companies and employees manually.
 
 At this point, understand:
 
-primary key
-foreign key
-one-to-many relationship
-why COMPANY_ID is in Employee
-what happens if you give an employee a non-existent company ID
+* primary key
+* foreign key
+* one-to-many relationship
+* why `COMPANY_ID` is in Employee
+* what happens if you give an employee a non-existent company ID
 
-Don't move on until this makes sense.
+**Don't move on until this makes sense.**
 
-🟢 Stage 3 — Write the Model classes yourself
+---
+
+# 🟢 Stage 3 — Write the Model classes yourself
 
 You don't need AI for this.
 
 Create:
 
+```text
 Company.java
 Employee.java
+```
 
 And try writing:
 
+```java
 public class Company {
     private int id;
     private String name;
@@ -865,6 +991,7 @@ public class Company {
     // getters
     // setters
 }
+```
 
 And similarly Employee.
 
@@ -872,28 +999,33 @@ This is easy enough that you should experience writing it yourself.
 
 If you get stuck on something, ask me:
 
-"I'm writing Employee.java. Why do I need getters and setters here?"
+> "I'm writing Employee.java. Why do I need getters and setters here?"
 
 rather than:
 
-"Generate Employee.java."
+> "Generate Employee.java."
 
-🟡 Stage 4 — Learn JDBC BEFORE creating DAO
+---
 
-This is probably the most important learning part.
+# 🟡 Stage 4 — Learn JDBC BEFORE creating DAO
 
-Don't immediately create EmployeeDAO.
+This is probably the **most important learning part**.
+
+Don't immediately create `EmployeeDAO`.
 
 First make a tiny standalone Java program that does:
 
+```text
 Java program
     ↓
 JDBC
     ↓
 H2
+```
 
 Learn this sequence:
 
+```java
 Connection
     ↓
 PreparedStatement
@@ -901,104 +1033,126 @@ PreparedStatement
 executeQuery()
     ↓
 ResultSet
+```
 
 and for INSERT/UPDATE/DELETE:
 
+```java
 Connection
     ↓
 PreparedStatement
     ↓
 executeUpdate()
+```
 
 You should manually write a small program that:
 
-connects to H2
-inserts an employee
-retrieves employees
-prints them
-updates one
-deletes one
+1. connects to H2
+2. inserts an employee
+3. retrieves employees
+4. prints them
+5. updates one
+6. deletes one
 
-Once you can do that, DAO will make sense rather than looking like mysterious boilerplate.
+Once you can do that, **DAO will make sense** rather than looking like mysterious boilerplate.
 
-🟡 Stage 5 — Now create DAO
+---
+
+# 🟡 Stage 5 — Now create DAO
 
 Now create:
 
+```text
 CompanyDAO.java
 EmployeeDAO.java
+```
 
 You try writing methods such as:
 
+```text
 getAllCompanies()
 getCompanyById()
 createCompany()
 updateCompany()
 deleteCompany()
+```
 
 and:
 
+```text
 getAllEmployees()
 getEmployeeById()
 createEmployee()
 updateEmployee()
 deleteEmployee()
+```
 
 You will notice that a lot of JDBC code repeats.
 
-This is exactly the kind of pain your manager wants you to experience.
+**This is exactly the kind of pain your manager wants you to experience.**
 
 You might think:
 
-"Why am I repeatedly opening connections, creating PreparedStatements, handling ResultSets and SQLExceptions?"
+> "Why am I repeatedly opening connections, creating PreparedStatements, handling ResultSets and SQLExceptions?"
 
 Good. 😂
 
 That's part of the lesson.
 
-🟡 Stage 6 — THEN use AI strategically
+---
+
+# 🟡 Stage 6 — THEN use AI strategically
 
 This is where AI becomes extremely useful.
 
 Suppose you've written:
 
+```java
 public List<Employee> getAllEmployees() {
     // your attempt
 }
+```
 
 and you're stuck.
 
 Don't say:
 
-"Generate EmployeeDAO."
+> "Generate EmployeeDAO."
 
 Instead ask:
 
-"I'm learning JDBC and implementing EmployeeDAO myself. I attempted getAllEmployees() below. Don't rewrite the complete method. Explain what steps are missing and give me hints so I can finish it myself."
+> **"I'm learning JDBC and implementing EmployeeDAO myself. I attempted getAllEmployees() below. Don't rewrite the complete method. Explain what steps are missing and give me hints so I can finish it myself."**
 
 Then you write it.
 
 Afterwards:
 
-"Review my implementation. Don't rewrite it. Point out bugs, bad practices and anything I should improve."
+> **"Review my implementation. Don't rewrite it. Point out bugs, bad practices and anything I should improve."**
 
-This is probably the best use of AI for this project.
+This is probably the **best use of AI for this project**.
 
-🟡 Stage 7 — Learn Servlets
+---
+
+# 🟡 Stage 7 — Learn Servlets
 
 Once DAO works independently, introduce:
 
+```text
 EmployeeServlet
 CompanyServlet
+```
 
-Start with only GET.
+Start with **only GET**.
 
 For example:
 
+```text
 GET /employees
+```
 
 should eventually do:
 
+```text
 Browser
    ↓
 EmployeeServlet
@@ -1008,26 +1162,32 @@ EmployeeService
 EmployeeDAO
    ↓
 H2
+```
 
 Don't build CRUD all at once.
 
-Get READ working first.
+Get **READ working first**.
 
 Then:
 
+```text
 GET → Read
 POST → Create
 PUT → Update
 DELETE → Delete
+```
 
 You'll learn HTTP semantics naturally this way.
 
-🟢 Stage 8 — Only then build the frontend
+---
+
+# 🟢 Stage 8 — Only then build the frontend
 
 Start with ugly HTML. Seriously. 😂
 
 Something like:
 
+```text
 Company | Employee
 
 -----------------------------
@@ -1037,11 +1197,13 @@ ID | Name | Role | Email | Company
 2  | Priya| QA   | ...   | 1
 
 [Add New]
+```
 
 Don't spend time making it beautiful.
 
 First make:
 
+```text
 HTML
  ↓
 JavaScript
@@ -1049,16 +1211,21 @@ JavaScript
 fetch()
  ↓
 Servlet
+```
 
 work.
 
 Then add the modal/form.
 
-🟢 Stage 9 — Finally implement the complete flow
+---
+
+# 🟢 Stage 9 — Finally implement the complete flow
 
 Your final application becomes:
 
-Read
+### Read
+
+```text
 Click Employee
       ↓
 GET /employees
@@ -1078,7 +1245,11 @@ JSON
 JavaScript
       ↓
 Table
-Create
+```
+
+### Create
+
+```text
 Add New
  ↓
 empty form
@@ -1096,7 +1267,11 @@ DAO
 INSERT
  ↓
 H2
-Update
+```
+
+### Update
+
+```text
 Click row
  ↓
 populate form
@@ -1110,7 +1285,11 @@ PUT
 DAO
  ↓
 UPDATE
-Delete
+```
+
+### Delete
+
+```text
 Click row
  ↓
 Delete
@@ -1120,14 +1299,19 @@ DELETE
 DAO
  ↓
 DELETE FROM EMPLOYEE
-🟠 Stage 10 — Connection pooling comes LAST
+```
+
+---
+
+# 🟠 Stage 10 — Connection pooling comes LAST
 
 Your original specification mentions manual connection pooling.
 
-Don't start there.
+**Don't start there.**
 
 Initially learn:
 
+```text
 Request
  ↓
 getConnection()
@@ -1135,13 +1319,15 @@ getConnection()
 use connection
  ↓
 close connection
+```
 
 Then understand the problem:
 
-"If every request creates a new DB connection, isn't repeatedly creating connections expensive?"
+> "If every request creates a new DB connection, isn't repeatedly creating connections expensive?"
 
 Then learn connection pooling:
 
+```text
 Connection Pool
  ┌─────────────────────┐
  │ Connection 1        │
@@ -1155,42 +1341,49 @@ Connection Pool
           │
           ↓
        return
+```
 
-That moment is exactly when frameworks/container infrastructure starts making more sense.
+**That moment is exactly when frameworks/container infrastructure starts making more sense.**
 
-Your AI usage strategy
+---
+
+# Your AI usage strategy
 
 I'd use this rule:
 
-Situation	What you should do
-Simple Java class	Write yourself
-SQL table	Write yourself
-Don't understand concept	Ask AI to explain
-JDBC syntax forgotten	Ask AI for a small example
-Stuck implementing a method	Ask AI for hints, not solution
-You've written code	Ask AI to review
-Error/exception	Give AI the error + your code and debug together
-Repetitive boilerplate	AI can generate it, but understand every line
-Entire project	❌ Don't generate at once
-Entire DAO	❌ Avoid initially
-Entire Servlet	❌ Avoid initially
-One particularly useful technique
+| Situation                   | What you should do                                   |
+| --------------------------- | ---------------------------------------------------- |
+| Simple Java class           | **Write yourself**                                   |
+| SQL table                   | **Write yourself**                                   |
+| Don't understand concept    | **Ask AI to explain**                                |
+| JDBC syntax forgotten       | **Ask AI for a small example**                       |
+| Stuck implementing a method | **Ask AI for hints, not solution**                   |
+| You've written code         | **Ask AI to review**                                 |
+| Error/exception             | **Give AI the error + your code and debug together** |
+| Repetitive boilerplate      | AI can generate it, **but understand every line**    |
+| Entire project              | ❌ Don't generate at once                             |
+| Entire DAO                  | ❌ Avoid initially                                    |
+| Entire Servlet              | ❌ Avoid initially                                    |
 
-Use AI like a senior developer sitting beside you, not like a code generator.
+---
+
+# One particularly useful technique
+
+Use AI like a **senior developer sitting beside you**, not like a code generator.
 
 For example:
 
-You:
+### You:
 
-I need to implement getAllEmployees() using JDBC. I know I need Connection, PreparedStatement and ResultSet, but I'm not sure about the sequence. Give me the conceptual steps, not code.
+> I need to implement `getAllEmployees()` using JDBC. I know I need Connection, PreparedStatement and ResultSet, but I'm not sure about the sequence. Give me the conceptual steps, not code.
 
 AI explains.
 
-Then you code it.
+Then **you code it**.
 
 Then:
 
-Here's my implementation. Review it but don't rewrite it.
+> Here's my implementation. Review it but don't rewrite it.
 
 AI reviews.
 
@@ -1198,30 +1391,35 @@ Then you fix it.
 
 Then:
 
-Why should I use PreparedStatement instead of Statement here?
+> Why should I use PreparedStatement instead of Statement here?
 
 You understand.
 
 That's significantly better than copying a generated DAO.
 
-How much AI should you actually use?
+---
 
-For this particular project, I'd aim roughly for:
+# How much AI should you actually use?
 
-70% you + 30% AI.
+For **this particular project**, I'd aim roughly for:
 
-Not because AI is bad, but because the project itself is deliberately designed as a learning exercise.
+**70% you + 30% AI.**
+
+Not because AI is bad, but because the project itself is deliberately designed as a **learning exercise**.
 
 For your actual Spring Boot project later, you can comfortably shift toward:
 
-30% you + 70% AI, provided you can understand, test and explain the generated code.
+**30% you + 70% AI**, provided you can understand, test and explain the generated code.
 
-And I would NOT use tutorials as your primary source
+---
 
-You can certainly learn from tutorials, but I'd use a small targeted learning → immediately implement approach.
+## And I would NOT use tutorials as your primary source
+
+You can certainly learn from tutorials, but I'd use a **small targeted learning → immediately implement** approach.
 
 For example:
 
+```text
 Learn: JDBC basics
        ↓
 Implement JDBC yourself
@@ -1235,13 +1433,17 @@ Learn: fetch()
 Implement frontend call
        ↓
 Connect everything
+```
 
 Don't spend three days watching "Complete Java Servlet Course" before writing a line of code.
 
-Your ideal development sequence
+---
+
+## Your ideal development sequence
 
 If I were guiding you through this project, I'd make you build exactly this:
 
+```text
 DAY 1
 ─────
 Understand architecture
@@ -1317,7 +1519,216 @@ Clean up code
 ↓
 Understand what Spring Boot would
 eventually automate
+```
 
-You don't necessarily need six full days; this is the learning sequence, not a strict schedule.
+You don't necessarily need six full days; this is the **learning sequence**, not a strict schedule.
 
-And honestly, I would build it this way rather than having AI generate file-by-file from the beginning. You will struggle more initially, but by the end you'll be able to look at a Spring Boot controller/repository/service and understand why those things exist, which is almost certainly what your manager is trying to achieve.
+And honestly, **I would build it this way rather than having AI generate file-by-file from the beginning**. You will struggle more initially, but by the end you'll be able to look at a Spring Boot controller/repository/service and understand *why those things exist*, which is almost certainly what your manager is trying to achieve.
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Yes. With only **5–6 hours**, don't try to learn everything deeply. Your goal should be:
+
+> **Get one complete CRUD flow working + understand what each layer is doing.**
+
+### ⏱️ 5–6 hour plan
+
+**0:00–0:20 — Setup**
+
+* Create a basic Java web project.
+* Configure Tomcat.
+* Add only required Servlet API + H2 JDBC driver.
+* Don't touch connection pooling yet.
+
+**0:20–0:45 — Database**
+Create:
+
+```text
+COMPANY
+ID | NAME | LOCATION
+
+EMPLOYEE
+ID | NAME | ROLE | EMAIL | COMPANY_ID
+```
+
+Relationship:
+
+```text
+1 Company → N Employees
+1 Employee → 1 Company
+```
+
+Insert a few sample rows.
+
+**0:45–1:15 — Models**
+Write yourself:
+
+```text
+Company.java
+Employee.java
+```
+
+Understand fields, constructors, getters/setters.
+
+**1:15–2:00 — JDBC + DAO**
+Don't build the entire DAO blindly.
+
+First make `getAllEmployees()` work.
+
+Understand:
+
+```text
+Connection
+ ↓
+PreparedStatement
+ ↓
+executeQuery()
+ ↓
+ResultSet
+ ↓
+Employee objects
+```
+
+Then add:
+
+```text
+createEmployee()
+updateEmployee()
+deleteEmployee()
+```
+
+Use AI **only when stuck/reviewing**.
+
+**2:00–2:30 — Servlet + Service**
+
+Create:
+
+```text
+EmployeeServlet
+EmployeeService
+```
+
+Get this working first:
+
+```text
+GET /employees
+       ↓
+Servlet
+       ↓
+Service
+       ↓
+DAO
+       ↓
+H2
+```
+
+Test it before touching UI.
+
+**2:30–3:15 — Frontend**
+
+Make very basic:
+
+```text
+Company | Employee
+
+ID | Name | Role | Email | Company ID
+
+[Add New]
+```
+
+Use vanilla JS `fetch()` to call your Servlet.
+
+First make **Employee GET** work.
+
+Then Company GET.
+
+**3:15–4:30 — CRUD UI**
+
+Implement in this order:
+
+```text
+READ
+ ↓
+CREATE
+ ↓
+UPDATE
+ ↓
+DELETE
+```
+
+Don't waste time making the modal beautiful.
+
+A basic form is enough.
+
+**4:30–5:00 — Reset + error handling**
+
+Implement:
+
+* New form → Reset = clear fields
+* Existing form → Reset = restore original values
+* Cancel = close form
+* Basic backend error response
+
+**5:00–5:30 — Connection pooling / cleanup**
+
+Only if everything else works.
+
+Otherwise **skip pooling today** and tell your manager:
+
+> "I completed the application using raw JDBC and kept connection pooling as the next improvement."
+
+That's much better than having half-working pooling + broken CRUD.
+
+**5:30–6:00 — Understand what you built**
+
+Be able to explain:
+
+```text
+Browser
+ ↓
+JavaScript fetch()
+ ↓
+Servlet
+ ↓
+Service
+ ↓
+DAO
+ ↓
+JDBC
+ ↓
+H2
+```
+
+and answer:
+
+* Why do we need a Servlet?
+* Why DAO?
+* Why Service?
+* Why JDBC?
+* Why PreparedStatement?
+* Why foreign key?
+* Why connection pooling?
+* What will Spring Boot simplify?
+
+---
+
+### 🚨 Most important: don't spend 2 hours learning before coding
+
+Use this loop:
+
+**10 min learn → 20 min code → 5 min AI/review → continue.**
+
+And tell AI:
+
+> **"I have 6 hours and this is a learning exercise. Don't generate the entire project. Help me implement one layer at a time. Prefer explanations/hints over complete code. If I ask for code, give me the smallest relevant example."**
+
+That will keep AI from doing the project *for* you.
+
+### Your minimum successful end-state
+
+If time runs out, prioritize:
+
+**H2 + Models → DAO → Servlet → GET → frontend display → Create → Update → Delete**
+
+Skip fancy UI, pooling, sophisticated validation, etc.
+
+If you get **one Employee CRUD flow completely working**, you've achieved the main learning objective.
