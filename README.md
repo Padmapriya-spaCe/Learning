@@ -36,15 +36,19 @@ Displays the records for whichever tab is selected.
 
 For example, clicking Company displays:
 
-ID	Company Name	Location
-1	Citi	Chennai
-2	ABC Corp	Bangalore
+| ID | Company Name | Location  |
+| -- | ------------ | --------- |
+| 1  | Citi         | Chennai   |
+| 2  | ABC Corp     | Bangalore |
+
 
 Clicking Employee displays:
 
-ID	Name	Role	Email	Company ID
-1	Arun	Developer	arun@email.com	1
-2	Priya	Analyst	priya@email.com	2
+| ID | Name  | Role      | Email                                     | Company ID |
+| -- | ----- | --------- | ----------------------------------------- | ---------- |
+| 1  | Arun  | Developer | [arun@email.com](mailto:arun@email.com)   | 1          |
+| 2  | Priya | Analyst   | [priya@email.com](mailto:priya@email.com) | 2          |
+
 
 No sophisticated UI or styling is required. Functionality and code structure are the focus.
 
@@ -56,13 +60,13 @@ An Add New button will be available outside the table.
 Clicking it opens an empty form.
 
 For example, for Employee:
-
 Name:       __________
 Role:       __________
 Email:      __________
 Company ID: __________
 
 [Create] [Reset] [Cancel]
+
 
 Clicking Create sends the data to the backend, which inserts a new employee into the database.
 
@@ -303,7 +307,7 @@ employee-company-app/
 │
 └── WEB-INF/
     └── web.xml
-
+    
 Depending on how your manager wants the project configured, web.xml may be replaced/partially replaced by servlet annotations such as @WebServlet.
 
 And if Tomcat's connection pool is specifically part of the exercise, there may also be:
